@@ -1,13 +1,14 @@
-# Step 1: Build Stage (Using Maven)
-FROM maven:3.8.6-eclipse-temurin-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
+# Use a lightweight JDK runtime as the base image
+FROM openjdk:17-jdk-slim
 
-# Step 2: Runtime Stage
-FROM eclipse-temurin:17-jdk
+# Set the working directory
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 9090
 
+# Copy the built JAR file from the Argo Workflow Maven build
+COPY target/*.jar app.jar
+
+# Expose the application port (if running on 8080)
+EXPOSE 8080
+
+# Run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
